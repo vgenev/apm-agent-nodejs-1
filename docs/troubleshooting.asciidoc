@@ -1,0 +1,98 @@
+[[troubleshooting]]
+
+ifdef::env-github[]
+NOTE: For the best reading experience,
+please view this documentation at https://www.elastic.co/guide/en/apm/agent/nodejs/current/troubleshooting.html[elastic.co]
+endif::[]
+
+== Troubleshooting
+
+[float]
+[[no-data-sent]]
+=== No data is sent to the APM Server
+
+If neither errors nor performance metrics are being sent to the APM Server,
+it's a good idea to first check your log file and look for output just as the app starts.
+
+[float]
+[[error-messages]]
+==== Explanation of error messages
+
+[float]
+[[message-agent-inactive]]
+===== Agent Inactive
+
+----
+Elastic APM agent is inactive due to configuration
+----
+
+You've most likely set the `active` option or the `ELASTIC_APM_ACTIVE` environment variable to `false`.
+Ensure that it's set to `true` and try again.
+
+See the API documentation about <<active,`active`>> for details.
+
+[float]
+[[message-missing-service-name]]
+===== Missing `serviceName`
+
+----
+Elastic APM isn't correctly configured: Missing serviceName
+----
+
+Ensure that the agent is correctly configured with a `serviceName` config option either by passing it to the `start()` function,
+by specifying it in the optional configuration file,
+or by using environment variables.
+
+See the API documentation on <<service-name,`serviceName`>> for details.
+
+[float]
+[[message-invalid-service-name]]
+===== Invalid `serviceName`
+
+----
+Elastic APM isn't correctly configured: serviceName "..." contains invalid characters! (allowed: a-z, A-Z, 0-9, _, -, <space>)
+----
+
+The `serviceName` you provided contained invalid characters.
+You can only use the letters a-z (both upper and lowercase), numbers, underscore (`_`), hyphen (`-`), and space (` `).
+
+See the API documentation on <<service-name,`serviceName`>> for details.
+
+[float]
+[[missing-performance-metrics]]
+=== No performance metrics sent to APM Server
+
+Errors get tracked just fine,
+but you don't see any performance metrics.
+
+First, make sure you have https://www.npmjs.com/package/elastic-apm-node[the latest version] of the Elastic APM Node.js agent.
+Issues are fixed and support for new metrics are added all the time,
+so make sure you keep your dependency up to date.
+
+If you are using the latest version but still don't see any performance metrics,
+make sure that the agent is *both required and started at the very top of your main app file* (usually the `index.js`, `server.js` or `app.js` file).
+It's important that the agent is started before any other modules are required.
+If not,
+the agent will not be able to hook into any modules and will not be able to measure the performance of your application.
+
+IMPORTANT: If you are using Babel / ES modules in your application,
+make sure you have read about the <<es-modules,Babel / ES Module support>>.
+
+If this is not the issue,
+your app dependencies might be incompatible with the agent.
+Please create a new topic in the https://discuss.elastic.co/c/apm[Elastic APM discuss forum] and try to include as much information as possible, such as:
+
+* The dependencies in you `package.json` file
+* Your app's main js file showing how the agent is initialized (usually the `index.js`, `server.js` or `app.js` file)
+* Your server logs with Elastic APM debugging enabled
+
+[float]
+[[debug-mode]]
+=== Debug mode
+
+To enable agent debugging and capture enough information,
+perform these steps:
+
+1. Start your app with the environment variable `ELASTIC_APM_LOG_LEVEL=trace` or add `logLevel: 'trace'` to the config file or `start(options)` call (see <<log-level,`logLevel`>> for details)
+2. Send a few HTTP requests to some of the app endpoints
+3. Wait at least 10 seconds to allow the agent to try and connect to the APM Server (controlled by <<api-request-time,`apiRequestTime`>>)

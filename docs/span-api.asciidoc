@@ -1,0 +1,149 @@
+[[span-api]]
+
+ifdef::env-github[]
+NOTE: For the best reading experience,
+please view this documentation at https://www.elastic.co/guide/en/apm/agent/nodejs/current/span-api.html[elastic.co]
+endif::[]
+
+=== `Span` API
+
+A span measures the duration of a single event.
+When a span is created it will measure the time until <<span-end,`span.end()`>> is called.
+
+To get a `Span` object,
+you need to call <<apm-start-span,`apm.startSpan()`>>.
+
+To see an example of using custom spans,
+see the <<custom-spans,Custom Spans in Node.js>> article.
+
+[[span-transaction]]
+==== `span.transaction`
+
+[small]#Added in: v0.1.0#
+
+* *Type:* Transaction
+
+A reference to the parent transaction object.
+
+All spans belong to a transaction.
+
+[[span-name]]
+==== `span.name`
+
+[small]#Added in: v0.1.0#
+
+* +{type-string}+ *Default:* `unnamed`
+
+The name of the span.
+This can also be set via <<apm-start-span,`apm.startSpan()`>>.
+
+[[span-type]]
+==== `span.type`
+
+[small]#Added in: v0.1.0#
+
+* +{type-string}+ *Default:* `custom`
+
+The type of span.
+This can also be set via <<apm-start-span,`apm.startSpan()`>>.
+
+The type is a hierarchical string used to group similar spans together.
+For instance,
+all spans of MySQL queries are given the type `db.mysql.query`.
+
+In the above example, `db` is considered the type prefix.
+Though there are no naming restrictions for this prefix,
+the following are standardized across all Elastic APM agents:
+`app`, `db`, `cache`, `template`, and `ext`.
+
+[[span-traceparent]]
+==== `span.traceparent`
+
+[small]#Added in: v2.9.0#
+
+Get the serialized traceparent string of the span.
+
+[[span-set-tag]]
+==== `span.setTag(name, value)`
+
+deprecated[2.10.0,Replaced by <<span-set-label>>]
+
+[small]#Added in: v2.1.0#
+
+* `name` +{type-string}+
+Periods (`.`), asterisks (`*`), and double quotation marks (`"`) will be replaced by underscores (`_`),
+as those characters have special meaning in Elasticsearch
+* `value` +{type-string}+
+If a non-string data type is given,
+it's converted to a string before being sent to the APM Server
+
+Set a tag on the span.
+You can set multiple tags on the same span.
+
+[[span-set-label]]
+==== `span.setLabel(name, value)`
+
+[small]#Added in: v2.1.0#
+
+[small]#Renamed from `span.setTag()` to `span.setLabel()`: v2.10.0#
+
+* `name` +{type-string}+
+Periods (`.`), asterisks (`*`), and double quotation marks (`"`) will be replaced by underscores (`_`),
+as those characters have special meaning in Elasticsearch
+* `value` +{type-string}+
+If a non-string data type is given,
+it's converted to a string before being sent to the APM Server
+
+Set a label on the span.
+You can set multiple labels on the same span.
+
+[[span-add-tags]]
+==== `span.addTags({ [name]: value })`
+
+deprecated[2.10.0,Replaced by <<span-add-labels>>]
+
+[small]#Added in: v2.1.0#
+
+* `tags` +{type-object}+ Contains key/value pairs:
+** `name` +{type-string}+
+Any periods (`.`), asterisks (`*`), or double quotation marks (`"`) will be replaced by underscores (`_`),
+as those characters have special meaning in Elasticsearch
+** `value` +{type-string}+
+If a non-string data type is given,
+it's converted to a string before being sent to the APM Server
+
+Add several tags on the span.
+You can add tags multiple times.
+
+[[span-add-labels]]
+==== `span.addLabels({ [name]: value })`
+
+[small]#Added in: v2.1.0#
+
+[small]#Renamed from `span.addTags()` to `span.addLabels()`: v2.10.0#
+
+* `labels` +{type-object}+ Contains key/value pairs:
+** `name` +{type-string}+
+Any periods (`.`), asterisks (`*`), or double quotation marks (`"`) will be replaced by underscores (`_`),
+as those characters have special meaning in Elasticsearch
+** `value` +{type-string}+
+If a non-string data type is given,
+it's converted to a string before being sent to the APM Server
+
+Add several labels on the span.
+You can add labels multiple times.
+
+[[span-end]]
+==== `span.end([endTime])`
+
+// [small]#Added in: #
+
+* `endTime` +{type-number}+ The time when the span ended.
+Must be a Unix Time Stamp representing the number of milliseconds since January 1, 1970, 00:00:00 UTC.
+Sub-millisecond precision can be achieved using decimals.
+If not provided,
+the current time will be used
+
+End the span.
+If the span has already ended,
+nothing happens.
